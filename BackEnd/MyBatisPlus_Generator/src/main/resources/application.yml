@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: Online Course Project
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/online_course
+  servlet:
+    multipart:
+      max-request-size: 100MB
+      max-file-size: 100MB
+server:
+  port: 3000
+
+
+
