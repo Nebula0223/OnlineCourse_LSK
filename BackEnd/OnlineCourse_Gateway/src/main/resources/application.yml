@@ -1,0 +1,10 @@
+server:
+  port: 3010
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: content
+          uri: http://localhost:3001
+          predicates:
+            - Path=/content/**

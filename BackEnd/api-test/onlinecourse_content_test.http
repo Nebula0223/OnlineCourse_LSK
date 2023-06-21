@@ -1,0 +1,8 @@
+###test (pageNo&pageSize在OnlineCourse_Base的model里，auditStatus&courseName&publishStatus在OnlineCourse_Content的dto里)
+POST {{gateway_host}}/content/course/list?pageNo=2&pageSize=1
+Content-Type: application/json
+
+{
+  "auditStatus": "202002",
+  "courseName": ""
+}

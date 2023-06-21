@@ -1,0 +1,13 @@
+server:
+  servlet:
+    context-path: /content
+  port: 3001
+spring:
+  application:
+    name: Online Course Content
+  servlet:
+    multipart:
+      max-file-size: 60MB
+      max-request-size: 500MB
+
+
