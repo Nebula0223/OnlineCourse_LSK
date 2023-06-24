@@ -7,7 +7,7 @@ import lombok.ToString;
 
 /**
  * @description 通用结果类型
- * @author Mr.M
+ * @author LSK
  * @date 2022/9/13 14:44
  * @version 1.0
  */
