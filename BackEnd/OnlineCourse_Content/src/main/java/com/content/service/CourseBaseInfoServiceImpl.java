@@ -10,6 +10,7 @@ import com.base.pojo.CourseCategory;
 import com.base.pojo.CourseMarket;
 import com.content.dto.AddCourseDto;
 import com.content.dto.CourseBaseInfoDto;
+import com.content.dto.EditCourseDto;
 import com.content.dto.QueryCourseParamsDto;
 import com.content.mapper.CourseBaseMapper;
 import com.content.mapper.CourseCategoryMapper;
@@ -39,6 +40,10 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     //用于：新增课程
     @Autowired
     CourseCategoryMapper courseCategoryMapper;
+
+    //用于：修改课程信息
+    @Autowired
+    CourseMarketServiceImpl courseMarketServiceImpl;
 
     //课程分页查询
     @Override
@@ -128,23 +133,72 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     }
 
     //根据课程id查询课程基本信息，包括基本信息和营销信息
-    public CourseBaseInfoDto getCourseBaseInfo(long courseId) {
-        CourseBase courseBase = courseBaseMapper.selectById(courseId);
-        CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
-        if (courseBase == null) {
-            return null;
-        }
+    @Override
+    public CourseBaseInfoDto getCourseBaseInfo(Long courseId) {
         CourseBaseInfoDto courseBaseInfoDto = new CourseBaseInfoDto();
+        // 1. 根据课程id查询课程基本信息
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if (courseBase == null)
+            return null;
+        // 1.1 拷贝属性
         BeanUtils.copyProperties(courseBase, courseBaseInfoDto);
-        if (courseMarket != null) {
+        // 2. 根据课程id查询课程营销信息
+        CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
+        // 2.1 拷贝属性
+        if (courseMarket != null)
             BeanUtils.copyProperties(courseMarket, courseBaseInfoDto);
-        }
-        //查询分类名称
+        // 3. 查询课程分类名称，并设置属性
+        // 3.1 根据小分类id查询课程分类对象
         CourseCategory courseCategoryBySt = courseCategoryMapper.selectById(courseBase.getSt());
+        // 3.2 设置课程的小分类名称
         courseBaseInfoDto.setStName(courseCategoryBySt.getName());
+        // 3.3 根据大分类id查询课程分类对象
         CourseCategory courseCategoryByMt = courseCategoryMapper.selectById(courseBase.getMt());
+        // 3.4 设置课程大分类名称
         courseBaseInfoDto.setMtName(courseCategoryByMt.getName());
         return courseBaseInfoDto;
+    }
+
+    @Override
+    public CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto) {
+        // 判断当前修改课程是否属于当前机构
+        Long courseId = editCourseDto.getId();
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if (!companyId.equals(courseBase.getCompanyId())) {
+            OnlineCourseException.cast("只允许修改本机构的课程");
+        }
+        // 拷贝对象
+        BeanUtils.copyProperties(editCourseDto, courseBase);
+        // 更新，设置更新时间
+        courseBase.setChangeDate(LocalDateTime.now());
+        courseBaseMapper.updateById(courseBase);
+        // 查询课程营销信息
+        CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
+        // 由于课程营销信息不是必填项，故这里先判断一下
+        if (courseMarket == null) {
+            courseMarket = new CourseMarket();
+        }
+        // 对象拷贝
+        BeanUtils.copyProperties(editCourseDto, courseMarket);
+        courseMarket.setId(courseId);
+        // 获取课程收费状态并设置
+        this.saveCourseMarket(courseMarket);
+        return getCourseBaseInfo(courseId);
+    }
+
+    private int saveCourseMarket(CourseMarket courseMarket) {
+        String charge = courseMarket.getCharge();
+        if (StringUtils.isBlank(charge))
+            OnlineCourseException.cast("请设置收费规则");
+        if (charge.equals("201001")) {
+            Float price = courseMarket.getPrice();
+            if (price == null || price <= 0) {
+                OnlineCourseException.cast("课程设置了收费，价格不能为空且必须大于0");
+            }
+        }
+        //插入课程营销信息表（Mybatis-plus框架封装了通用service类，里边的saveOrUpdate方法可实现该功能）
+        boolean flag = courseMarketServiceImpl.saveOrUpdate(courseMarket);
+        return flag ? 1 : -1;
     }
 }
 

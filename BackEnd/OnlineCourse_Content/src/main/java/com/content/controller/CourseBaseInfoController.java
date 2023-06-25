@@ -6,6 +6,7 @@ import com.base.model.PageResult;
 import com.base.pojo.CourseBase;
 import com.content.dto.AddCourseDto;
 import com.content.dto.CourseBaseInfoDto;
+import com.content.dto.EditCourseDto;
 import com.content.dto.QueryCourseParamsDto;
 import com.content.service.CourseBaseInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +32,19 @@ public class CourseBaseInfoController {
         return courseBaseInfoService.createCourseBase(companyId, addCourseDto);
     }
 
-//    @GetMapping("/course/{courseId}")
-//    public CourseBaseInfoDto getCourseBaseById(@PathVariable Long courseId){
-//        return courseBaseInfoService.getCourseBaseInfo(courseId);
-//    }
-//
-//    @PutMapping("/course")
-//    public CourseBaseInfoDto modifyCourseBase(@RequestBody @Validated EditCourseDto editCourseDto){
-//        //机构id，由于认证系统没有上线暂时硬编码
-//        Long companyId = 1232141425L;
-//        return courseBaseInfoService.updateCourseBase(companyId,editCourseDto);
-//    }
+    //根据课程id查询课程基础信息
+    @GetMapping("/course/{courseId}")
+    public CourseBaseInfoDto getCourseBaseById(@PathVariable Long courseId){
+        return courseBaseInfoService.getCourseBaseInfo(courseId);
+    }
+
+    //修改课程信息
+    @PutMapping("/course")
+    public CourseBaseInfoDto modifyCourseBase(@RequestBody EditCourseDto editCourseDto){
+        //机构id，由于认证系统没有上线暂时硬编码
+        Long companyId = 1232141425L;
+        return courseBaseInfoService.updateCourseBase(companyId,editCourseDto);
+    }
 }
 
 /**

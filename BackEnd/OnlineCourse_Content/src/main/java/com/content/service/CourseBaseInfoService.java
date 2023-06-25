@@ -5,6 +5,7 @@ import com.base.model.PageResult;
 import com.base.pojo.CourseBase;
 import com.content.dto.AddCourseDto;
 import com.content.dto.CourseBaseInfoDto;
+import com.content.dto.EditCourseDto;
 import com.content.dto.QueryCourseParamsDto;
 
 public interface CourseBaseInfoService {
@@ -14,6 +15,12 @@ public interface CourseBaseInfoService {
 
     //新增课程
     CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto addCourseDto);
+
+    //根据课程id查询课程基本信息
+    CourseBaseInfoDto getCourseBaseInfo(Long courseId);
+
+    //修改课程信息
+    CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto);
 }
 
 /**
