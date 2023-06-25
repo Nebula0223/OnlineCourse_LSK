@@ -10,7 +10,6 @@ import com.content.dto.EditCourseDto;
 import com.content.dto.QueryCourseParamsDto;
 import com.content.service.CourseBaseInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController //相当于@Controller和@ResponseBody

@@ -1,12 +1,10 @@
 package com.content.controller;
 
 import com.content.dto.BindTeachplanMediaDto;
+import com.content.dto.SaveTeachplanDto;
 import com.content.dto.TeachplanDto;
 import com.base.pojo.Teachplan;
 import com.content.service.TeachplanService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +23,8 @@ public class TeachplanController {
 
     //课程计划创建或修改
     @PostMapping("/teachplan")
-    public void saveTeachplan(@RequestBody Teachplan teachplanDto) {
-        teachplanService.saveTeachplan(teachplanDto);
+    public void saveTeachplan(@RequestBody SaveTeachplanDto saveTeachplanDto) {
+        teachplanService.saveTeachplan(saveTeachplanDto);
     }
 
     //课程计划删除

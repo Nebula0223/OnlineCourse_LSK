@@ -19,8 +19,11 @@ public interface CourseBaseInfoService {
     //根据课程id查询课程基本信息
     CourseBaseInfoDto getCourseBaseInfo(Long courseId);
 
-    //修改课程信息
+    //修改课程信息（本机构只能修改本机构课程）
     CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto);
+
+//    //删除课程
+//    void delectCourse(Long companyId, Long courseId);
 }
 
 /**

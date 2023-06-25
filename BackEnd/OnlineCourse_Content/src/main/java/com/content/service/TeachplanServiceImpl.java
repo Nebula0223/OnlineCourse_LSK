@@ -3,6 +3,7 @@ package com.content.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.base.exception.OnlineCourseException;
 import com.base.pojo.TeachplanMedia;
+import com.content.dto.SaveTeachplanDto;
 import com.content.mapper.TeachplanMapper;
 import com.content.mapper.TeachplanMediaMapper;
 import com.content.dto.BindTeachplanMediaDto;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Slf4j
 @Service
 public class TeachplanServiceImpl implements TeachplanService {
     @Autowired
@@ -32,32 +32,34 @@ public class TeachplanServiceImpl implements TeachplanService {
         return teachplanMapper.selectTreeNodes(courseId);
     }
 
-    @Transactional
     @Override
-    public void saveTeachplan(Teachplan teachplan) {
-        Long teachplanId = teachplan.getId();
-        if (teachplanId == null) {
-            // 课程计划id为null，创建对象，拷贝属性，设置创建时间和排序号
-            Teachplan plan = new Teachplan();
-            BeanUtils.copyProperties(teachplan, plan);
-            plan.setCreateDate(LocalDateTime.now());
-            // 设置排序号
-            plan.setOrderby(getTeachplanCount(plan.getCourseId(), plan.getParentid()) + 1);
-            // 如果新增失败，返回0，抛异常
-            int flag = teachplanMapper.insert(plan);
-            if (flag <= 0) OnlineCourseException.cast("新增失败");
-        } else {
-            // 课程计划id不为null，查询课程，拷贝属性，设置更新时间，执行更新
-            Teachplan plan = teachplanMapper.selectById(teachplanId);
-            BeanUtils.copyProperties(teachplan, plan);
-            plan.setChangeDate(LocalDateTime.now());
-            // 如果修改失败，返回0，抛异常
-            int flag = teachplanMapper.updateById(plan);
-            if (flag <= 0) OnlineCourseException.cast("修改失败");
+    public void saveTeachplan(SaveTeachplanDto teachplanDto) {
+        //课程计划id
+        Long teachplanId = teachplanDto.getId();
+        //修改课程计划
+        if (teachplanId != null) {
+            Teachplan teachplan = teachplanMapper.selectById(teachplanId);
+            BeanUtils.copyProperties(teachplanDto, teachplan);
+            teachplanMapper.updateById(teachplan);
+        }
+        else {
+            //取出同父同级别的课程计划数量
+            int count = getTeachplanCount(teachplanDto.getCourseId(), teachplanDto.getParentid());
+            Teachplan teachplanNew = new Teachplan();
+            //设置排序号
+            teachplanNew.setOrderby(count + 1);
+            BeanUtils.copyProperties(teachplanDto, teachplanNew);
+            teachplanMapper.insert(teachplanNew);
         }
     }
 
-    @Transactional
+    private int getTeachplanCount(Long courseId, Long parentId) {
+        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teachplan::getCourseId, courseId);
+        queryWrapper.eq(Teachplan::getParentid, parentId);
+        return teachplanMapper.selectCount(queryWrapper);
+    }
+
     @Override
     public void deleteTeachplan(Long teachplanId) {
         if (teachplanId == null)
@@ -88,7 +90,6 @@ public class TeachplanServiceImpl implements TeachplanService {
         }
     }
 
-    @Transactional
     @Override
     public void orderByTeachplan(String moveType, Long teachplanId) {
         Teachplan teachplan = teachplanMapper.selectById(teachplanId);
@@ -154,7 +155,6 @@ public class TeachplanServiceImpl implements TeachplanService {
         return teachplanMapper.selectById(teachplanId);
     }
 
-    @Transactional
     @Override
     public void associationMedia(BindTeachplanMediaDto bindTeachplanMediaDto) {
         Long teachplanId = bindTeachplanMediaDto.getTeachplanId();
@@ -190,12 +190,7 @@ public class TeachplanServiceImpl implements TeachplanService {
         teachplanMediaMapper.delete(queryWrapper);
     }
 
-    /**
-     * 交换两个Teachplan的orderby
-     *
-     * @param teachplan teachplan1
-     * @param tmp       teachplan2
-     */
+    //交换两个Teachplan的orderby
     private void exchangeOrderby(Teachplan teachplan, Teachplan tmp) {
         if (tmp == null)
             OnlineCourseException.cast("已经到头啦，不能再移啦");
@@ -208,13 +203,6 @@ public class TeachplanServiceImpl implements TeachplanService {
             teachplanMapper.updateById(tmp);
             teachplanMapper.updateById(teachplan);
         }
-    }
-
-    private int getTeachplanCount(Long courseId, Long parentId) {
-        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Teachplan::getCourseId, courseId);
-        queryWrapper.eq(Teachplan::getParentid, parentId);
-        return teachplanMapper.selectCount(queryWrapper);
     }
 
 

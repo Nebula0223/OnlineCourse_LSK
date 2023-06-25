@@ -5,16 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.base.exception.OnlineCourseException;
 import com.base.model.PageParams;
 import com.base.model.PageResult;
-import com.base.pojo.CourseBase;
-import com.base.pojo.CourseCategory;
-import com.base.pojo.CourseMarket;
+import com.base.pojo.*;
 import com.content.dto.AddCourseDto;
 import com.content.dto.CourseBaseInfoDto;
 import com.content.dto.EditCourseDto;
 import com.content.dto.QueryCourseParamsDto;
-import com.content.mapper.CourseBaseMapper;
-import com.content.mapper.CourseCategoryMapper;
-import com.content.mapper.CourseMarketMapper;
+import com.content.mapper.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,6 +41,14 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     //用于：修改课程信息
     @Autowired
     CourseMarketServiceImpl courseMarketServiceImpl;
+
+//    //用于：删除课程
+//    @Autowired
+//    CourseTeacherMapper courseTeacherMapper;
+//
+//    //用于：删除课程
+//    @Autowired
+//    TeachplanMapper teachplanMapper;
 
     //课程分页查询
     @Override
@@ -200,6 +205,25 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         boolean flag = courseMarketServiceImpl.saveOrUpdate(courseMarket);
         return flag ? 1 : -1;
     }
+
+//    @Override
+//    public void delectCourse(Long companyId, Long courseId) {
+//        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+//        if (!companyId.equals(courseBase.getCompanyId()))
+//            OnlineCourseException.cast("只允许删除本机构的课程");
+//        // 删除课程教师信息
+//        LambdaQueryWrapper<CourseTeacher> teacherLambdaQueryWrapper = new LambdaQueryWrapper<>();
+//        teacherLambdaQueryWrapper.eq(CourseTeacher::getCourseId, courseId);
+//        courseTeacherMapper.delete(teacherLambdaQueryWrapper);
+//        // 删除课程计划
+//        LambdaQueryWrapper<Teachplan> teachplanLambdaQueryWrapper = new LambdaQueryWrapper<>();
+//        teachplanLambdaQueryWrapper.eq(Teachplan::getCourseId, courseId);
+//        teachplanMapper.delete(teachplanLambdaQueryWrapper);
+//        // 删除营销信息
+//        courseMarketMapper.deleteById(courseId);
+//        // 删除课程基本信息
+//        courseBaseMapper.deleteById(courseId);
+//    }
 }
 
 /**

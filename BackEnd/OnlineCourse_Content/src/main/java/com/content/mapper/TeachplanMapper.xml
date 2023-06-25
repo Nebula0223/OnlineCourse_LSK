@@ -64,6 +64,7 @@
             </association>
         </collection>
     </resultMap>
+
     <select id="selectTreeNodes" resultMap="treeNodeResultMap" parameterType="long">
         SELECT p.id              p_id,
                p.pname           p_pname,
